@@ -1,0 +1,10 @@
+{
+  "/_global-error/page": "app/_global-error/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/subscribe/route": "app/api/subscribe/route.js",
+  "/deals/[category]/[slug]/page": "app/deals/[category]/[slug]/page.js",
+  "/deals/[category]/page": "app/deals/[category]/page.js",
+  "/page": "app/page.js",
+  "/robots.txt/route": "app/robots.txt/route.js",
+  "/sitemap.xml/route": "app/sitemap.xml/route.js"
+}

@@ -1,0 +1,17 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/deals/layout,_N_T_/deals/[category]/layout,_N_T_/deals/[category]/[slug]/layout,_N_T_/deals/[category]/[slug]/page,_N_T_/deals/travel/carry-on-luggage-20-spinner"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/deals/$d$category/$d$slug/__PAGE__",
+    "/deals/$d$category/$d$slug",
+    "/deals/$d$category",
+    "/deals",
+    "/_index",
+    "/_head"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/api/subscribe/route": "/api/subscribe",
+  "/deals/[category]/[slug]/page": "/deals/[category]/[slug]",
+  "/deals/[category]/page": "/deals/[category]",
+  "/page": "/",
+  "/robots.txt/route": "/robots.txt",
+  "/sitemap.xml/route": "/sitemap.xml"
+}
