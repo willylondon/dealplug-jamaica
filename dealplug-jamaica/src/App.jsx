@@ -10,9 +10,9 @@ const DealPlugJamaica = () => {
 
   // TODO: Replace these with your actual social media profile URLs
   const socialLinks = {
-    twitter: 'https://x.com/DealPlugJA',
+    twitter: 'https://x.com/dealplugjamaica',
     tiktok: 'https://tiktok.com/@dealplugjamaica',
-    telegram: 'https://t.me/dealplugjamaica',
+    telegram: 'https://t.me/+nAWW1QsMPKpkNWNh',
   };
 
   const categories = [
