@@ -1,27 +1,19 @@
 import React, { useState, useEffect } from 'react';
 
-// SEO Meta Component (for reference - would be in document head)
-const SEOHead = () => (
-  <>
-    {/* 
-    <title>DealPlug Jamaica | Best Deals & Discounts in Jamaica</title>
-    <meta name="description" content="Jamaica's #1 deals platform. Save 20-80% on electronics, fashion, home goods & more. Curated daily deals for smart Jamaican shoppers." />
-    <meta name="keywords" content="Jamaica deals, Jamaican discounts, online shopping Jamaica, best prices Jamaica, DealPlug" />
-    <meta property="og:title" content="DealPlug Jamaica - Never Pay Full Price" />
-    <meta property="og:description" content="Jamaica's trusted source for the best online deals. Save big every day." />
-    <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <link rel="canonical" href="https://dealplugjamaica.com" />
-    */}
-  </>
-);
-
 const DealPlugJamaica = () => {
   const [email, setEmail] = useState('');
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [activeCategory, setActiveCategory] = useState('all');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [visibleDeals, setVisibleDeals] = useState([]);
+  const [visibleCount, setVisibleCount] = useState(4);
+
+  // TODO: Replace these with your actual social media profile URLs
+  const socialLinks = {
+    twitter: 'https://x.com/DealPlugJA',
+    tiktok: 'https://tiktok.com/@dealplugjamaica',
+    telegram: 'https://t.me/dealplugjamaica',
+  };
 
   const categories = [
     { id: 'all', name: 'All Deals', icon: '🔥' },
@@ -32,39 +24,63 @@ const DealPlugJamaica = () => {
     { id: 'travel', name: 'Travel', icon: '✈️' },
   ];
 
+  // TODO: Replace 'link' values with your actual Temu/AliExpress affiliate links
   const deals = [
-    { id: 1, category: 'electronics', title: 'TWS Wireless Earbuds Bluetooth 5.3', originalPrice: 29.99, salePrice: 8.99, discount: 70, tag: 'HOT', rating: 4.8, reviews: 2341 },
-    { id: 2, category: 'home', title: 'Air Fryer 4.5L Digital Touch Screen', originalPrice: 89.99, salePrice: 32.99, discount: 63, tag: 'TRENDING', rating: 4.9, reviews: 5672 },
-    { id: 3, category: 'electronics', title: 'Portable Bluetooth Speaker Waterproof', originalPrice: 45.00, salePrice: 12.50, discount: 72, tag: 'NEW', rating: 4.7, reviews: 1893 },
-    { id: 4, category: 'fashion', title: 'Men\'s Running Shoes Breathable Sneakers', originalPrice: 68.00, salePrice: 18.99, discount: 72, tag: 'POPULAR', rating: 4.6, reviews: 4456 },
-    { id: 5, category: 'home', title: 'Electric Pressure Cooker 6L Multi-Function', originalPrice: 79.99, salePrice: 28.99, discount: 64, tag: 'BESTSELLER', rating: 4.9, reviews: 8203 },
-    { id: 6, category: 'travel', title: 'Carry-On Luggage 20" Spinner Hardside', originalPrice: 120.00, salePrice: 42.50, discount: 65, tag: 'LIMITED', rating: 4.8, reviews: 987 },
-    { id: 7, category: 'electronics', title: 'Smart Watch Fitness Tracker Heart Rate', originalPrice: 59.99, salePrice: 15.99, discount: 73, tag: 'VERIFIED', rating: 4.8, reviews: 12341 },
-    { id: 8, category: 'home', title: 'Cordless Vacuum Cleaner 25000Pa Suction', originalPrice: 159.00, salePrice: 54.99, discount: 65, tag: 'PREMIUM', rating: 4.7, reviews: 3876 },
+    { id: 1, category: 'electronics', title: 'TWS Wireless Earbuds Bluetooth 5.3', originalPrice: 29.99, salePrice: 8.99, discount: 70, tag: 'HOT', rating: 4.8, reviews: 2341, image: '/images/product_earbuds.png', link: 'https://www.temu.com' },
+    { id: 2, category: 'home', title: 'Air Fryer 4.5L Digital Touch Screen', originalPrice: 89.99, salePrice: 32.99, discount: 63, tag: 'TRENDING', rating: 4.9, reviews: 5672, image: '/images/product_airfryer.png', link: 'https://www.temu.com' },
+    { id: 3, category: 'electronics', title: 'Portable Bluetooth Speaker Waterproof', originalPrice: 45.00, salePrice: 12.50, discount: 72, tag: 'NEW', rating: 4.7, reviews: 1893, image: '/images/product_speaker.png', link: 'https://www.temu.com' },
+    { id: 4, category: 'fashion', title: "Men's Running Shoes Breathable Sneakers", originalPrice: 68.00, salePrice: 18.99, discount: 72, tag: 'POPULAR', rating: 4.6, reviews: 4456, image: '/images/product_shoes.png', link: 'https://www.temu.com' },
+    { id: 5, category: 'home', title: 'Electric Pressure Cooker 6L Multi-Function', originalPrice: 79.99, salePrice: 28.99, discount: 64, tag: 'BESTSELLER', rating: 4.9, reviews: 8203, image: '/images/product_cooker.png', link: 'https://www.temu.com' },
+    { id: 6, category: 'travel', title: 'Carry-On Luggage 20" Spinner Hardside', originalPrice: 120.00, salePrice: 42.50, discount: 65, tag: 'LIMITED', rating: 4.8, reviews: 987, image: '/images/product_luggage.png', link: 'https://www.temu.com' },
+    { id: 7, category: 'electronics', title: 'Smart Watch Fitness Tracker Heart Rate', originalPrice: 59.99, salePrice: 15.99, discount: 73, tag: 'VERIFIED', rating: 4.8, reviews: 12341, image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=300&fit=crop&auto=format&q=80', link: 'https://www.temu.com' },
+    { id: 8, category: 'home', title: 'Cordless Vacuum Cleaner 25000Pa Suction', originalPrice: 159.00, salePrice: 54.99, discount: 65, tag: 'PREMIUM', rating: 4.7, reviews: 3876, image: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&h=300&fit=crop&auto=format&q=80', link: 'https://www.temu.com' },
   ];
 
   const blogPosts = [
-    { id: 1, title: 'Top 10 Money-Saving Tips for Jamaican Shoppers', excerpt: 'Discover proven strategies to stretch your dollar further when shopping online...', date: 'Mar 28, 2026', category: 'Tips', readTime: '5 min' },
-    { id: 2, title: 'Black Friday Jamaica 2026: What to Expect', excerpt: 'Get ready for the biggest shopping event of the year with our complete guide...', date: 'Mar 25, 2026', category: 'Events', readTime: '8 min' },
-    { id: 3, title: 'How to Spot Fake Deals Online', excerpt: 'Protect yourself from scams with these essential verification techniques...', date: 'Mar 22, 2026', category: 'Guide', readTime: '6 min' },
+    { id: 1, title: 'Top 10 Money-Saving Tips for Jamaican Shoppers', excerpt: 'Discover proven strategies to stretch your dollar further when shopping online...', date: 'Mar 28, 2026', category: 'Tips', readTime: '5 min', image: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&h=400&fit=crop&auto=format&q=80' },
+    { id: 2, title: 'Black Friday Jamaica 2026: What to Expect', excerpt: 'Get ready for the biggest shopping event of the year with our complete guide...', date: 'Mar 25, 2026', category: 'Events', readTime: '8 min', image: 'https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=600&h=400&fit=crop&auto=format&q=80' },
+    { id: 3, title: 'How to Spot Fake Deals Online', excerpt: 'Protect yourself from scams with these essential verification techniques...', date: 'Mar 22, 2026', category: 'Guide', readTime: '6 min', image: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=600&h=400&fit=crop&auto=format&q=80' },
   ];
 
-  const filteredDeals = activeCategory === 'all' 
-    ? deals 
+  const filteredDeals = activeCategory === 'all'
+    ? deals
     : deals.filter(d => d.category === activeCategory);
+
+  const displayedDeals = filteredDeals.slice(0, visibleCount);
+  const hasMoreDeals = visibleCount < filteredDeals.length;
 
   useEffect(() => {
     setVisibleDeals([]);
-    filteredDeals.forEach((_, i) => {
+    setVisibleCount(4);
+    displayedDeals.forEach((_, i) => {
       setTimeout(() => {
         setVisibleDeals(prev => [...prev, i]);
       }, i * 80);
     });
   }, [activeCategory]);
 
+  useEffect(() => {
+    const newIndices = [];
+    for (let i = 0; i < displayedDeals.length; i++) {
+      if (!visibleDeals.includes(i)) {
+        newIndices.push(i);
+      }
+    }
+    newIndices.forEach((idx, i) => {
+      setTimeout(() => {
+        setVisibleDeals(prev => [...prev, idx]);
+      }, i * 80);
+    });
+  }, [visibleCount]);
+
+  const handleLoadMore = () => {
+    setVisibleCount(prev => prev + 4);
+  };
+
   const handleSubscribe = (e) => {
     e.preventDefault();
     if (email) {
+      // TODO: Integrate with email service (Mailchimp, ConvertKit, etc.)
       setIsSubscribed(true);
       setEmail('');
     }
@@ -85,90 +101,18 @@ const DealPlugJamaica = () => {
     'PREMIUM': 'bg-slate-700',
   };
 
+  const TwitterIcon = () => (
+    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+  );
+  const TikTokIcon = () => (
+    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z"/></svg>
+  );
+  const TelegramIcon = () => (
+    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0a12 12 0 00-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+  );
+
   return (
     <div className="min-h-screen bg-slate-50" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
-        
-        :root {
-          --gold: #D4A84B;
-          --gold-light: #E8C878;
-          --gold-dark: #B8923F;
-          --green: #2D8B4E;
-          --green-light: #3AA862;
-          --green-dark: #236B3C;
-          --navy: #1E3A5F;
-          --navy-light: #2D4F7A;
-          --black: #0F0F0F;
-        }
-        
-        .brand-gradient {
-          background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
-        }
-        
-        .green-gradient {
-          background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
-        }
-        
-        .trust-gradient {
-          background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-        }
-        
-        .hero-gradient {
-          background: linear-gradient(135deg, #0F0F0F 0%, #1a1a2e 50%, #16213e 100%);
-        }
-        
-        .card-hover {
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .card-hover:hover {
-          transform: translateY(-6px);
-          box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.15);
-        }
-        
-        .deal-enter {
-          animation: dealEnter 0.5s ease-out forwards;
-          opacity: 0;
-        }
-        
-        @keyframes dealEnter {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        .shimmer {
-          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-          background-size: 200% 100%;
-          animation: shimmer 2s infinite;
-        }
-        
-        @keyframes shimmer {
-          0% { background-position: -200% 0; }
-          100% { background-position: 200% 0; }
-        }
-        
-        .text-gold { color: var(--gold); }
-        .text-green { color: var(--green); }
-        .bg-gold { background-color: var(--gold); }
-        .bg-green { background-color: var(--green); }
-        .border-gold { border-color: var(--gold); }
-        .border-green { border-color: var(--green); }
-        
-        .social-icon {
-          transition: all 0.2s ease;
-        }
-        
-        .social-icon:hover {
-          transform: translateY(-3px);
-        }
-      `}</style>
 
       {/* Header */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
@@ -181,14 +125,14 @@ const DealPlugJamaica = () => {
               <span className="font-semibold text-amber-400">Save up to 80% today!</span>
             </p>
             <div className="flex items-center gap-4">
-              <a href="#" className="hover:text-amber-400 transition-colors social-icon" aria-label="Twitter">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="hover:text-amber-400 transition-colors social-icon" aria-label="Twitter/X">
+                <TwitterIcon />
               </a>
-              <a href="#" className="hover:text-amber-400 transition-colors social-icon" aria-label="TikTok">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z"/></svg>
+              <a href={socialLinks.tiktok} target="_blank" rel="noopener noreferrer" className="hover:text-amber-400 transition-colors social-icon" aria-label="TikTok">
+                <TikTokIcon />
               </a>
-              <a href="#" className="hover:text-amber-400 transition-colors social-icon" aria-label="Telegram">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0a12 12 0 00-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+              <a href={socialLinks.telegram} target="_blank" rel="noopener noreferrer" className="hover:text-amber-400 transition-colors social-icon" aria-label="Telegram">
+                <TelegramIcon />
               </a>
             </div>
           </div>
@@ -197,7 +141,6 @@ const DealPlugJamaica = () => {
         {/* Main Nav */}
         <nav className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            {/* Logo */}
             <div className="flex items-center gap-3">
               <div className="flex items-center">
                 <span className="text-2xl md:text-3xl font-extrabold tracking-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
@@ -208,7 +151,6 @@ const DealPlugJamaica = () => {
               </div>
             </div>
 
-            {/* Desktop Nav */}
             <div className="hidden md:flex items-center gap-8">
               <a href="#deals" className="font-semibold text-slate-700 hover:text-green transition-colors">Deals</a>
               <a href="#categories" className="font-semibold text-slate-700 hover:text-green transition-colors">Categories</a>
@@ -216,17 +158,15 @@ const DealPlugJamaica = () => {
               <a href="#about" className="font-semibold text-slate-700 hover:text-green transition-colors">About</a>
             </div>
 
-            {/* CTA */}
             <div className="flex items-center gap-3">
               <button className="hidden sm:flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-white green-gradient hover:opacity-90 transition-opacity shadow-lg shadow-green/20">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
                 Get Alerts
               </button>
-              
-              {/* Mobile Menu Button */}
-              <button 
+              <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="md:hidden p-2 rounded-lg hover:bg-slate-100"
+                aria-label="Toggle menu"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   {mobileMenuOpen ? (
@@ -239,14 +179,13 @@ const DealPlugJamaica = () => {
             </div>
           </div>
 
-          {/* Mobile Menu */}
           {mobileMenuOpen && (
             <div className="md:hidden mt-4 pb-4 border-t border-slate-200 pt-4">
               <div className="flex flex-col gap-4">
-                <a href="#deals" className="font-semibold text-slate-700">Deals</a>
-                <a href="#categories" className="font-semibold text-slate-700">Categories</a>
-                <a href="#blog" className="font-semibold text-slate-700">Blog</a>
-                <a href="#about" className="font-semibold text-slate-700">About</a>
+                <a href="#deals" className="font-semibold text-slate-700" onClick={() => setMobileMenuOpen(false)}>Deals</a>
+                <a href="#categories" className="font-semibold text-slate-700" onClick={() => setMobileMenuOpen(false)}>Categories</a>
+                <a href="#blog" className="font-semibold text-slate-700" onClick={() => setMobileMenuOpen(false)}>Blog</a>
+                <a href="#about" className="font-semibold text-slate-700" onClick={() => setMobileMenuOpen(false)}>About</a>
                 <button className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-full font-semibold text-white green-gradient">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
                   Get Deal Alerts
@@ -259,10 +198,9 @@ const DealPlugJamaica = () => {
 
       {/* Hero Section */}
       <section className="hero-gradient text-white py-16 md:py-24 relative overflow-hidden">
-        {/* Decorative elements */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-amber-500/10 to-transparent rounded-full blur-3xl"></div>
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-emerald-500/10 to-transparent rounded-full blur-3xl"></div>
-        
+
         <div className="max-w-7xl mx-auto px-4 relative">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 mb-6">
@@ -279,8 +217,8 @@ const DealPlugJamaica = () => {
             </h1>
 
             <p className="text-lg md:text-xl text-slate-300 mb-8 max-w-xl leading-relaxed">
-              We find the best deals across the internet so you don't have to. 
-              <span className="text-white font-semibold"> Verified savings, curated daily </span> 
+              We find the best deals across the internet so you don't have to.
+              <span className="text-white font-semibold"> Verified savings, curated daily </span>
               for smart Jamaican shoppers.
             </p>
 
@@ -327,7 +265,7 @@ const DealPlugJamaica = () => {
                     className="flex-1 px-5 py-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder-slate-400 focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all"
                     required
                   />
-                  <button 
+                  <button
                     type="submit"
                     className="px-8 py-4 rounded-xl font-bold brand-gradient text-black hover:opacity-90 transition-opacity shadow-lg shadow-gold/20 whitespace-nowrap"
                   >
@@ -385,7 +323,7 @@ const DealPlugJamaica = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {filteredDeals.map((deal, index) => (
+            {displayedDeals.map((deal, index) => (
               <article
                 key={deal.id}
                 className={`bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden card-hover ${
@@ -393,53 +331,66 @@ const DealPlugJamaica = () => {
                 }`}
                 style={{ animationDelay: `${index * 0.08}s` }}
               >
-                {/* Image Area */}
-                <div className="relative bg-gradient-to-br from-slate-100 to-slate-50 p-8 flex items-center justify-center min-h-[180px]">
-                  <span className={`absolute top-3 left-3 ${tagColors[deal.tag]} text-white text-xs font-bold px-3 py-1 rounded-full`}>
+                {/* Product Image */}
+                <div className="relative bg-gradient-to-br from-slate-100 to-slate-50 overflow-hidden">
+                  <span className={`absolute top-3 left-3 z-10 ${tagColors[deal.tag]} text-white text-xs font-bold px-3 py-1 rounded-full`}>
                     {deal.tag}
                   </span>
-                  <span className="absolute top-3 right-3 bg-black text-gold text-sm font-bold px-3 py-1 rounded-full">
+                  <span className="absolute top-3 right-3 z-10 bg-black text-gold text-sm font-bold px-3 py-1 rounded-full">
                     -{deal.discount}%
                   </span>
-                  <div className="w-24 h-24 bg-white rounded-xl shadow-sm flex items-center justify-center">
-                    <svg className="w-12 h-12 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
-                  </div>
+                  <img
+                    src={deal.image}
+                    alt={deal.title}
+                    className="w-full h-[200px] object-cover hover:scale-105 transition-transform duration-300"
+                    loading="lazy"
+                  />
                 </div>
 
                 {/* Content */}
                 <div className="p-5">
-                  {/* Rating */}
                   <div className="flex items-center gap-2 mb-2">
                     <div className="flex items-center">
                       {[...Array(5)].map((_, i) => (
                         <svg key={i} className={`w-4 h-4 ${i < Math.floor(deal.rating) ? 'text-amber-400' : 'text-slate-200'}`} fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
                       ))}
                     </div>
-                    <span className="text-sm text-slate-500">({deal.reviews})</span>
+                    <span className="text-sm text-slate-500">({deal.reviews.toLocaleString()})</span>
                   </div>
 
                   <h3 className="font-bold text-slate-900 mb-3 line-clamp-2 leading-snug">{deal.title}</h3>
-                  
+
                   <div className="flex items-baseline gap-3 mb-4">
                     <span className="text-2xl font-extrabold text-green">{formatPrice(deal.salePrice)}</span>
                     <span className="text-slate-400 line-through text-sm">{formatPrice(deal.originalPrice)}</span>
+                    <span className="text-xs text-slate-500 font-medium">USD</span>
                   </div>
 
-                  <button className="w-full py-3 rounded-xl font-bold text-white green-gradient hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+                  <a
+                    href={deal.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-3 rounded-xl font-bold text-white green-gradient hover:opacity-90 transition-opacity flex items-center justify-center gap-2 block"
+                  >
                     Get Deal
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-                  </button>
+                  </a>
                 </div>
               </article>
             ))}
           </div>
 
-          <div className="text-center mt-12">
-            <button className="inline-flex items-center gap-2 px-8 py-4 rounded-full font-bold border-2 border-slate-300 text-slate-700 hover:border-green hover:text-green transition-colors">
-              Load More Deals
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-            </button>
-          </div>
+          {hasMoreDeals && (
+            <div className="text-center mt-12">
+              <button
+                onClick={handleLoadMore}
+                className="inline-flex items-center gap-2 px-8 py-4 rounded-full font-bold border-2 border-slate-300 text-slate-700 hover:border-green hover:text-green transition-colors"
+              >
+                Load More Deals
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+              </button>
+            </div>
+          )}
         </div>
       </section>
 
@@ -461,7 +412,6 @@ const DealPlugJamaica = () => {
               <h3 className="text-xl font-bold text-slate-900 mb-3">We Hunt</h3>
               <p className="text-slate-600">Our team scours hundreds of retailers daily to find the deepest discounts and best values.</p>
             </div>
-
             <div className="text-center p-8 rounded-2xl bg-slate-50 border border-slate-200">
               <div className="w-16 h-16 rounded-2xl bg-green/10 flex items-center justify-center mx-auto mb-6">
                 <svg className="w-8 h-8 text-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
@@ -469,7 +419,6 @@ const DealPlugJamaica = () => {
               <h3 className="text-xl font-bold text-slate-900 mb-3">We Verify</h3>
               <p className="text-slate-600">Every deal is checked and validated. No expired codes, no fake discounts — only real savings.</p>
             </div>
-
             <div className="text-center p-8 rounded-2xl bg-slate-50 border border-slate-200">
               <div className="w-16 h-16 rounded-2xl bg-blue-500/10 flex items-center justify-center mx-auto mb-6">
                 <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -500,8 +449,13 @@ const DealPlugJamaica = () => {
           <div className="grid md:grid-cols-3 gap-8">
             {blogPosts.map((post) => (
               <article key={post.id} className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden card-hover">
-                <div className="bg-gradient-to-br from-slate-100 to-slate-200 h-48 flex items-center justify-center">
-                  <svg className="w-16 h-16 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" /></svg>
+                <div className="h-48 overflow-hidden">
+                  <img
+                    src={post.image}
+                    alt={post.title}
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                    loading="lazy"
+                  />
                 </div>
                 <div className="p-6">
                   <div className="flex items-center gap-3 mb-3">
@@ -557,13 +511,13 @@ const DealPlugJamaica = () => {
                 Jamaica's trusted source for verified deals and savings. We curate the best discounts so you can shop smarter.
               </p>
               <div className="flex gap-4">
-                <a href="#" className="w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center transition-colors social-icon" aria-label="Twitter/X">
+                <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center transition-colors social-icon" aria-label="Twitter/X">
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
                 </a>
-                <a href="#" className="w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center transition-colors social-icon" aria-label="TikTok">
+                <a href={socialLinks.tiktok} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center transition-colors social-icon" aria-label="TikTok">
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z"/></svg>
                 </a>
-                <a href="#" className="w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center transition-colors social-icon" aria-label="Telegram">
+                <a href={socialLinks.telegram} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center transition-colors social-icon" aria-label="Telegram">
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0a12 12 0 00-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
                 </a>
               </div>

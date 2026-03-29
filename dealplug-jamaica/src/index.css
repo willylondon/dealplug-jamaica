@@ -55,6 +55,17 @@
   }
 }
 
+.shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
 .social-icon {
   transition: all 0.2s ease;
 }
@@ -64,6 +75,8 @@
 }
 
 .text-gold { color: var(--gold); }
-.text-green-brand { color: var(--green); }
+.text-green { color: var(--green); }
 .bg-gold { background-color: var(--gold); }
-.bg-green-brand { background-color: var(--green); }
+.bg-green { background-color: var(--green); }
+.border-gold { border-color: var(--gold); }
+.border-green { border-color: var(--green); }
