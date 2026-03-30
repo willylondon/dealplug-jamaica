@@ -5,8 +5,9 @@ import { deals } from '@/lib/data';
 import { ProductSchema, BreadcrumbListSchema } from '@/components/StructuredData';
 
 // Generates correct SEO for the specific product
-export function generateMetadata({ params }) {
-  const deal = deals.find(d => d.slug === params.slug);
+export async function generateMetadata({ params }) {
+  const { slug } = await params;
+  const deal = deals.find(d => d.slug === slug);
   if (!deal) return { title: 'Deal Not Found' };
 
   return {
@@ -45,8 +46,9 @@ export function generateStaticParams() {
   }));
 }
 
-export default function ProductPage({ params }) {
-  const deal = deals.find(d => d.slug === params.slug);
+export default async function ProductPage({ params }) {
+  const { slug } = await params;
+  const deal = deals.find(d => d.slug === slug);
 
   if (!deal) {
     return <div className="text-center py-20 text-2xl font-bold">Deal not found</div>;

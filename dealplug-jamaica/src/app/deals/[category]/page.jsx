@@ -4,8 +4,8 @@ import DealCard from '@/components/DealCard';
 import { deals, categories } from '@/lib/data';
 
 // Generate dynamic metadata for the category
-export function generateMetadata({ params }) {
-  const categoryId = params.category;
+export async function generateMetadata({ params }) {
+  const { category: categoryId } = await params;
   const category = categories.find((c) => c.id === categoryId);
   const titleName = category ? category.name : 'All';
 
@@ -30,8 +30,8 @@ export function generateStaticParams() {
   }));
 }
 
-export default function CategoryPage({ params }) {
-  const categoryId = params.category;
+export default async function CategoryPage({ params }) {
+  const { category: categoryId } = await params;
   const categoryData = categories.find((c) => c.id === categoryId);
   
   if (!categoryData && categoryId !== 'all') {
