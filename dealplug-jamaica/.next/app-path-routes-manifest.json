@@ -1,7 +1,10 @@
 {
   "/_global-error/page": "/_global-error",
   "/_not-found/page": "/_not-found",
+  "/api/deals/latest/route": "/api/deals/latest",
   "/api/subscribe/route": "/api/subscribe",
+  "/blog/[slug]/page": "/blog/[slug]",
+  "/blog/page": "/blog",
   "/deals/[category]/[slug]/page": "/deals/[category]/[slug]",
   "/deals/[category]/page": "/deals/[category]",
   "/page": "/",

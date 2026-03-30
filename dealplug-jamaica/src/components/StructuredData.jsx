@@ -73,3 +73,29 @@ export const BreadcrumbListSchema = ({ items }) => {
     />
   );
 };
+
+export const ArticleSchema = ({ article }) => {
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Article",
+          "headline": article.title,
+          "image": [
+            article.image
+          ],
+          "datePublished": new Date(article.date).toISOString(),
+          "dateModified": new Date(article.date).toISOString(),
+          "author": [{
+            "@type": "Organization",
+            "name": "DealPlug Jamaica",
+            "url": "https://dealplugjamaica.com"
+          }],
+          "description": article.excerpt
+        })
+      }}
+    />
+  );
+};

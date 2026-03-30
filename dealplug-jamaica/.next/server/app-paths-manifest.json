@@ -1,7 +1,10 @@
 {
   "/_global-error/page": "app/_global-error/page.js",
   "/_not-found/page": "app/_not-found/page.js",
+  "/api/deals/latest/route": "app/api/deals/latest/route.js",
   "/api/subscribe/route": "app/api/subscribe/route.js",
+  "/blog/[slug]/page": "app/blog/[slug]/page.js",
+  "/blog/page": "app/blog/page.js",
   "/deals/[category]/[slug]/page": "app/deals/[category]/[slug]/page.js",
   "/deals/[category]/page": "app/deals/[category]/page.js",
   "/page": "app/page.js",

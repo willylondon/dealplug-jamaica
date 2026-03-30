@@ -1,4 +1,4 @@
-import { deals, categories } from '@/lib/data';
+import { deals, categories, blogPosts } from '@/lib/data';
 
 export default function sitemap() {
   const baseUrl = 'https://dealplugjamaica.com';
@@ -11,6 +11,12 @@ export default function sitemap() {
       changeFrequency: 'daily',
       priority: 1.0,
     },
+    {
+      url: `${baseUrl}/blog`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.9,
+    }
   ];
 
   // Category routes
@@ -29,5 +35,13 @@ export default function sitemap() {
     priority: 0.6,
   }));
 
-  return [...routes, ...categoryRoutes, ...dealRoutes];
+  // Blog routes
+  const blogRoutes = blogPosts.map((post) => ({
+    url: `${baseUrl}/blog/${post.slug}`,
+    lastModified: new Date(post.date),
+    changeFrequency: 'never',
+    priority: 0.7,
+  }));
+
+  return [...routes, ...categoryRoutes, ...dealRoutes, ...blogRoutes];
 }

@@ -168,6 +168,107 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Telegram CTA Section */}
+      <section className="py-20 md:py-28 bg-slate-900 relative overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute top-0 left-0 w-72 h-72 rounded-full bg-gold/10 blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 rounded-full bg-green/10 blur-3xl translate-x-1/3 translate-y-1/3 pointer-events-none"></div>
+
+        <div className="max-w-7xl mx-auto px-4 relative z-10">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+
+            {/* Left: Copy */}
+            <div>
+              <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white text-sm font-bold px-4 py-2 rounded-full mb-6">
+                <span className="w-2 h-2 rounded-full bg-green animate-pulse"></span>
+                Free to Join — 0 Spam
+              </div>
+              <h2 className="text-4xl md:text-5xl font-extrabold font-jakarta text-white leading-tight mb-6">
+                Get Deals <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold to-yellow-300">Before Everyone Else</span>
+              </h2>
+              <p className="text-slate-300 text-lg leading-relaxed mb-8 max-w-lg">
+                Our Telegram channel is where the real deals drop first — before they hit the website, before they sell out. Join 100% free and never miss a plug again.
+              </p>
+
+              {/* Benefits */}
+              <ul className="space-y-4 mb-10">
+                {[
+                  { icon: '⚡', title: 'First Access', desc: 'Hot deals hit Telegram hours before anywhere else.' },
+                  { icon: '🔥', title: 'Daily Deal Drops', desc: 'Fresh deals sent directly to your phone every day.' },
+                  { icon: '💰', title: 'Exclusive Price Alerts', desc: 'Flash sales and limited-time drops only for members.' },
+                  { icon: '📦', title: 'Shipping & Customs Tips', desc: 'Jamaica-specific advice so you never overpay on delivery.' },
+                ].map((b) => (
+                  <li key={b.title} className="flex items-start gap-4">
+                    <span className="w-10 h-10 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center text-xl shrink-0">{b.icon}</span>
+                    <div>
+                      <p className="text-white font-bold text-sm">{b.title}</p>
+                      <p className="text-slate-400 text-sm leading-snug">{b.desc}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+
+              <a
+                href={socialLinks.telegram}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-3 bg-[#0088CC] hover:bg-[#007ab8] text-white px-8 py-4 rounded-full font-bold text-lg transition-all shadow-2xl shadow-sky-900/40 hover:-translate-y-0.5 active:translate-y-0"
+              >
+                {/* Telegram icon */}
+                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                </svg>
+                Join Our Telegram Channel
+              </a>
+            </div>
+
+            {/* Right: Phone mockup card */}
+            <div className="hidden md:flex justify-center">
+              <div className="relative w-72">
+                {/* Glow */}
+                <div className="absolute inset-0 bg-[#0088CC]/20 blur-3xl rounded-full"></div>
+                {/* Card */}
+                <div className="relative bg-white/5 border border-white/10 rounded-3xl p-6 backdrop-blur-sm">
+                  {/* Channel header */}
+                  <div className="flex items-center gap-3 mb-5 pb-5 border-b border-white/10">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-gold to-green flex items-center justify-center text-xl font-extrabold text-white shadow-lg">D</div>
+                    <div>
+                      <p className="text-white font-bold text-sm">DealPlug Jamaica 🇯🇲</p>
+                      <p className="text-slate-400 text-xs">Telegram Channel</p>
+                    </div>
+                    <div className="ml-auto">
+                      <div className="w-2 h-2 rounded-full bg-green animate-pulse"></div>
+                    </div>
+                  </div>
+                  {/* Fake messages */}
+                  {[
+                    { emoji: '🔥', text: 'LED Strip 5M RGB — only $3.99!', time: '9:01 AM', hot: true },
+                    { emoji: '⚡', text: 'Phone case 4-pack under $5 — link inside', time: '11:43 AM', hot: false },
+                    { emoji: '💰', text: 'Air fryer 4.5L — $32 (was $90)', time: '2:15 PM', hot: true },
+                    { emoji: '📦', text: 'Shipping tip: stay under US$100 for zero customs duty!', time: '5:30 PM', hot: false },
+                  ].map((msg, i) => (
+                    <div key={i} className={`mb-3 last:mb-0 rounded-2xl rounded-tl-sm px-4 py-3 text-sm ${msg.hot ? 'bg-gold/20 border border-gold/30' : 'bg-white/5 border border-white/5'}`}>
+                      <p className="text-white leading-snug">{msg.emoji} {msg.text}</p>
+                      <p className="text-slate-500 text-xs mt-1">{msg.time}</p>
+                    </div>
+                  ))}
+                  {/* CTA inside card */}
+                  <a
+                    href={socialLinks.telegram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-5 w-full flex items-center justify-center gap-2 bg-[#0088CC] hover:bg-[#007ab8] text-white py-3 rounded-2xl font-bold text-sm transition-colors"
+                  >
+                    Join Channel →
+                  </a>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
       {/* Blog Teaser Section */}
       <section id="blog" className="py-20 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4">

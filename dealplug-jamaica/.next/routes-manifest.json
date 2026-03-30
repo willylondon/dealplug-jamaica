@@ -23,6 +23,14 @@
   },
   "dynamicRoutes": [
     {
+      "page": "/blog/[slug]",
+      "regex": "^/blog/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPslug": "nxtPslug"
+      },
+      "namedRegex": "^/blog/(?<nxtPslug>[^/]+?)(?:/)?$"
+    },
+    {
       "page": "/deals/[category]",
       "regex": "^/deals/([^/]+?)(?:/)?$",
       "routeKeys": {
@@ -60,10 +68,22 @@
       "namedRegex": "^/_not\\-found(?:/)?$"
     },
     {
+      "page": "/api/deals/latest",
+      "regex": "^/api/deals/latest(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/deals/latest(?:/)?$"
+    },
+    {
       "page": "/api/subscribe",
       "regex": "^/api/subscribe(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/api/subscribe(?:/)?$"
+    },
+    {
+      "page": "/blog",
+      "regex": "^/blog(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/blog(?:/)?$"
     },
     {
       "page": "/robots.txt",
