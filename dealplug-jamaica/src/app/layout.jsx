@@ -3,32 +3,48 @@ import { OrganizationSchema } from '@/components/StructuredData';
 import '../index.css';
 
 export const metadata = {
-  title: 'DealPlug Jamaica | Best Temu & AliExpress Deals with Free Shipping',
+  metadataBase: new URL('https://www.dealplugjamaica.com'),
+  title: {
+    default: 'DealPlug Jamaica | Best Deals from Temu & AliExpress',
+    template: '%s | DealPlug Jamaica'
+  },
   description: 'Find the hottest deals from Temu and AliExpress delivered to Jamaica. Save up to 90% on electronics, fashion, home goods and more. Updated daily!',
-  keywords: 'Jamaica deals, Temu Jamaica, AliExpress Jamaica, online shopping Jamaica, cheap shipping Jamaica',
+  keywords: ['Jamaica deals', 'Temu Jamaica', 'AliExpress Jamaica', 'online shopping Jamaica', 'cheap shipping Jamaica'],
+  authors: [{ name: 'DealPlug Jamaica' }],
+  creator: 'DealPlug Jamaica',
+  publisher: 'DealPlug Jamaica',
   openGraph: {
-    title: 'DealPlug Jamaica | Best Temu & AliExpress Deals',
-    description: 'Find the hottest deals from Temu and AliExpress delivered to Jamaica. Save up to 90% on electronics, fashion, home goods and more.',
-    url: 'https://dealplugjamaica.com',
+    type: 'website',
+    locale: 'en_JM',
+    url: 'https://www.dealplugjamaica.com',
     siteName: 'DealPlug Jamaica',
+    title: 'DealPlug Jamaica | Best Deals from Temu & AliExpress',
+    description: 'Find the hottest deals from Temu and AliExpress delivered to Jamaica. Save up to 90%!',
     images: [
       {
-        url: 'https://dealplugjamaica.com/images/desktop_full_page.png',
+        url: '/og-image.jpg',
         width: 1200,
         height: 630,
-      },
+        alt: 'DealPlug Jamaica - Never Pay Full Price',
+      }
     ],
-    locale: 'en_JM',
-    type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'DealPlug Jamaica | Best Temu & AliExpress Deals',
-    description: 'Find the hottest deals from Temu and AliExpress delivered to Jamaica. Save up to 90%!',
-    images: ['https://dealplugjamaica.com/images/desktop_full_page.png'],
+    title: 'DealPlug Jamaica | Best Deals from Temu & AliExpress',
+    description: 'Find the hottest deals from Temu and AliExpress delivered to Jamaica.',
+    images: ['/og-image.jpg'],
   },
-  alternates: {
-    canonical: 'https://dealplugjamaica.com',
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
 };
 

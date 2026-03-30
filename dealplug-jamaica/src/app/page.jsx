@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import DealCard from '@/components/DealCard';
 import Newsletter from '@/components/Newsletter';
 import { deals, categories, blogPosts, socialLinks } from '@/lib/data';
@@ -35,12 +36,16 @@ export default function Home() {
           </div>
           <div className="relative z-10 animate-fade-in hidden md:block">
             <div className="absolute inset-0 bg-gold blur-3xl opacity-20 rounded-full animate-pulse-slow"></div>
-            <img 
-              src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800&q=80" 
-              alt="Online Shopping Jamaica" 
-              className="rounded-3xl shadow-2xl border-4 border-white transform rotate-2 hover:rotate-0 transition-transform duration-500 relative z-10"
-              loading="eager"
-            />
+            <div className="relative h-[600px] w-full rounded-3xl shadow-2xl border-4 border-white transform rotate-2 hover:rotate-0 transition-transform duration-500 overflow-hidden z-10">
+              <Image 
+                src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800&q=80" 
+                alt="Online Shopping Jamaica" 
+                fill
+                priority
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover"
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -212,11 +217,12 @@ export default function Home() {
                   <span className="absolute top-4 left-4 z-10 bg-white/90 backdrop-blur-sm text-slate-800 text-xs font-bold px-3 py-1.5 rounded-full shadow-sm">
                     {post.category}
                   </span>
-                  <img 
+                  <Image 
                     src={post.image} 
                     alt={post.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    loading="lazy"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
                 <div className="p-6">

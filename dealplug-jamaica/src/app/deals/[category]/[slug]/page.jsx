@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { deals } from '@/lib/data';
 import { ProductSchema, BreadcrumbListSchema } from '@/components/StructuredData';
 
@@ -87,11 +88,13 @@ export default function ProductPage({ params }) {
                   Save {deal.discount}%
                 </span>
               </div>
-              <img
+              <Image
                 src={deal.image}
                 alt={`${deal.title} - ${deal.tag || 'Sale'} | DealPlug Jamaica`}
-                className="w-full h-full object-cover"
-                loading="eager"
+                fill
+                priority
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover"
               />
             </div>
 
