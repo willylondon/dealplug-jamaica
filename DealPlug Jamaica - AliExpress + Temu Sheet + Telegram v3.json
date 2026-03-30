@@ -1,0 +1,767 @@
+{
+  "name": "DealPlug Jamaica - AliExpress + Temu Sheet + Telegram v3",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 3
+            }
+          ]
+        }
+      },
+      "id": "a618cd2f-36c0-4c47-b422-e5f1d13a1d2c",
+      "name": "Every 3 Hours",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1632,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    config: {\n      enableTelegram: true,\n      enableWhatsApp: false,\n      enableTwitter: true,\n      telegramChatId: '-3432705907',\n      whatsappChatId: 'YOUR_WHATSAPP_BROADCAST_ID',\n      googleSheetId: '1u8LUepeWdAP5hMUtGCk4yQ3j_HxxGmwSvJEg4982XDk',\n      sheetName: 'Deals',\n      aliAppKey: 'YOUR_ALI_APP_KEY',\n      aliAppSecret: 'YOUR_ALI_APP_SECRET',\n      aliTrackingId: 'dealplugjamaica',\n      aliEndpoint: 'https://api-sg.aliexpress.com/sync',\n      xDailyLimitPerRun: 5\n    }\n  }\n}];"
+      },
+      "id": "554494ba-b010-4359-957f-e9305723b0b9",
+      "name": "Set Runtime Config",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1408,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const cfg = $json.config;\nconst categories = [\n  {\n    category: 'Tech Deals',\n    aliKeywords: 'phone case charging cable earbuds',\n    aliCategoryId: '509'\n  },\n  {\n    category: 'Home & LED Finds',\n    aliKeywords: 'LED strip light motion sensor kitchen gadget',\n    aliCategoryId: '200003498'\n  },\n  {\n    category: 'Gift Ideas Under $10',\n    aliKeywords: 'jewelry keychain mini speaker gift',\n    aliCategoryId: '207'\n  },\n  {\n    category: 'Bulk Deals for Businesses',\n    aliKeywords: 'label sticker packaging tape bag',\n    aliCategoryId: '200003655'\n  }\n];\nreturn categories.map(c => ({ json: { ...c, config: cfg } }));"
+      },
+      "id": "fd8ff40f-4849-49bc-a356-15cc3e6260a5",
+      "name": "Define Categories",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1184,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getRows",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1u8LUepeWdAP5hMUtGCk4yQ3j_HxxGmwSvJEg4982XDk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Deals_Raw"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Posted",
+              "lookupValue": "No"
+            }
+          ]
+        },
+        "options": {
+          "returnAllMatches": true
+        }
+      },
+      "id": "417b91a2-5725-46f3-a044-bbea7cdec2da",
+      "name": "Temu RSS Fetch",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.4,
+      "position": [
+        -944,
+        -48
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HVNzZnwvqx321S1M",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Convert manually-added Temu rows from Google Sheet into deal format.\n// You add Temu deals to the Deals_Raw sheet -> n8n picks them up and posts them.\nconst cfg = $('Define Categories').first().json.config;\n\n// If no row data, skip\nif (!$json.Title && !$json.title) return [];\n\nconst title        = ($json.Title || $json.title || '').trim();\nconst price        = Number($json['Price (USD)'] || $json.price || 0);\nconst rating       = Number($json.Rating || $json.rating || 4.5);\nconst orders       = Number($json.Orders || $json.orders || 100);\nconst affiliateUrl = ($json['Affiliate Link'] || $json.affiliateUrl || '').trim();\nconst imageUrl     = ($json['Image URL'] || $json.imageUrl || '').trim();\nconst category     = ($json.Category || $json.category || 'General').trim();\nconst commission   = ($json['Commission %'] || $json.commissionRate || '').trim();\n\n// Skip rows with missing data or out-of-range prices\nif (!title || !affiliateUrl || price <= 0 || price > 50) return [];\n\nreturn [{\n  json: {\n    source: 'temu_sheet',\n    sourceProductId: affiliateUrl,\n    duplicateKey: `temu_sheet:${affiliateUrl}`,\n    title,\n    price,\n    currency: 'USD',\n    rating,\n    orders,\n    imageUrl,\n    productUrl: affiliateUrl,\n    affiliateUrl,\n    category,\n    commissionRate: commission,\n    scrapedAt: new Date().toISOString(),\n    score: 0,\n    priceBucket: price <= 5 ? 'UNDER_5' : (price <= 10 ? 'UNDER_10' : 'UNDER_15'),\n    sourcePriority: 1,\n    config: cfg\n  }\n}];"
+      },
+      "id": "31169ce1-8d2b-45bb-a52d-bc573d7952b9",
+      "name": "Normalize Temu Deals",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -704,
+        -48
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const crypto = require('crypto');\nconst cfg = $json.config;\nconst timestamp = new Date().toISOString().replace('T', ' ').replace('Z', '');\nconst params = {\n  app_key: cfg.aliAppKey,\n  category_ids: $json.aliCategoryId,\n  fields: 'commission_rate,sale_price,product_title,product_main_image_url,product_detail_url,evaluate_rate,lastest_volume,product_id',\n  format: 'json',\n  keywords: $json.aliKeywords,\n  max_sale_price: '15',\n  method: 'aliexpress.affiliate.product.query',\n  page_no: '1',\n  page_size: '20',\n  sign_method: 'md5',\n  sort: 'SALE_PRICE_ASC',\n  target_currency: 'USD',\n  timestamp,\n  tracking_id: cfg.aliTrackingId,\n  v: '2.0'\n};\n\nconst sortedKeys = Object.keys(params).sort();\nlet signString = '';\nfor (const key of sortedKeys) {\n  signString += key + params[key];\n}\nconst sign = crypto\n  .createHash('md5')\n  .update(cfg.aliAppSecret + signString + cfg.aliAppSecret, 'utf8')\n  .digest('hex')\n  .toUpperCase();\n\nreturn [{\n  json: {\n    config: cfg,\n    category: $json.category,\n    aliParams: { ...params, sign }\n  }\n}];"
+      },
+      "id": "98a38dd8-dd55-4795-88a5-43a279a6abd0",
+      "name": "Build AliExpress Signed Params",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -944,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.config.aliEndpoint }}",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "method",
+              "value": "={{ $json.aliParams.method }}"
+            },
+            {
+              "name": "app_key",
+              "value": "={{ $json.aliParams.app_key }}"
+            },
+            {
+              "name": "category_ids",
+              "value": "={{ $json.aliParams.category_ids }}"
+            },
+            {
+              "name": "fields",
+              "value": "={{ $json.aliParams.fields }}"
+            },
+            {
+              "name": "format",
+              "value": "={{ $json.aliParams.format }}"
+            },
+            {
+              "name": "keywords",
+              "value": "={{ $json.aliParams.keywords }}"
+            },
+            {
+              "name": "max_sale_price",
+              "value": "={{ $json.aliParams.max_sale_price }}"
+            },
+            {
+              "name": "page_no",
+              "value": "={{ $json.aliParams.page_no }}"
+            },
+            {
+              "name": "page_size",
+              "value": "={{ $json.aliParams.page_size }}"
+            },
+            {
+              "name": "sign_method",
+              "value": "={{ $json.aliParams.sign_method }}"
+            },
+            {
+              "name": "sort",
+              "value": "={{ $json.aliParams.sort }}"
+            },
+            {
+              "name": "target_currency",
+              "value": "={{ $json.aliParams.target_currency }}"
+            },
+            {
+              "name": "timestamp",
+              "value": "={{ $json.aliParams.timestamp }}"
+            },
+            {
+              "name": "tracking_id",
+              "value": "={{ $json.aliParams.tracking_id }}"
+            },
+            {
+              "name": "v",
+              "value": "={{ $json.aliParams.v }}"
+            },
+            {
+              "name": "sign",
+              "value": "={{ $json.aliParams.sign }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "a48f5f43-6f45-4470-8aab-28a2bf586f97",
+      "name": "AliExpress Official Fetch",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -704,
+        192
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const cfg = $('Build AliExpress Signed Params').item.json.config;\nconst category = $('Build AliExpress Signed Params').item.json.category;\nconst result =\n  $json?.aliexpress_affiliate_product_query_response?.resp_result?.result?.products?.product || [];\nconst products = Array.isArray(result) ? result : [];\nreturn products\n  .filter(p => Number(p.sale_price || 0) > 0)\n  .map(p => ({\n    json: {\n      source: 'aliexpress',\n      sourceProductId: String(p.product_id || p.product_detail_url || p.product_title),\n      duplicateKey: `aliexpress:${String(p.product_id || p.product_detail_url || p.product_title)}`,\n      title: p.product_title,\n      price: Number(Number(p.sale_price || 0).toFixed(2)),\n      currency: 'USD',\n      rating: Number(Number(p.evaluate_rate || 0).toFixed(1)),\n      orders: Number(p.lastest_volume || 0),\n      imageUrl: p.product_main_image_url || '',\n      productUrl: p.product_detail_url || '',\n      affiliateUrl: p.product_detail_url || '',\n      category,\n      commissionRate: p.commission_rate || '',\n      scrapedAt: new Date().toISOString(),\n      score: 0,\n      priceBucket: Number(p.sale_price || 0) <= 5 ? 'UNDER_5' : (Number(p.sale_price || 0) <= 10 ? 'UNDER_10' : 'UNDER_15'),\n      sourcePriority: 2,\n      config: cfg\n    }\n  }));"
+      },
+      "id": "f1da4a87-a078-4cee-861d-80bb78ccde8b",
+      "name": "Normalize AliExpress Deals",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -464,
+        192
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "9a52b232-9a45-49eb-9e84-4cd0de84da98",
+      "name": "Merge Temu + AliExpress",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -464,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all().map(i => i.json);\nconst map = new Map();\n\nfor (const d of items) {\n  if (!d.duplicateKey) continue;\n  const existing = map.get(d.duplicateKey);\n  if (!existing || Number(d.orders || 0) > Number(existing.orders || 0)) {\n    const price      = Number(d.price || 0);\n    const rating     = Number(d.rating || 0);\n    const orders     = Number(d.orders || 0);\n    const commission = Number(String(d.commissionRate || '0').replace('%', '')) || 0;\n    const visualBoost   = /light|led|speaker|case|gift|gadget/i.test(d.title || '') ? 10 : 0;\n    const underFiveBoost = price <= 5 ? 25 : 0;\n    const score = Math.round(\n      (Math.min(orders, 5000) / 100) +\n      (rating * 12) +\n      ((15 - Math.min(price, 15)) * 5) +\n      (commission * 2) +\n      visualBoost +\n      underFiveBoost\n    );\n    d.score = score;\n    map.set(d.duplicateKey, d);\n  }\n}\n\nconst twitterHooks = [\n  '🔥 DEAL ALERT 🇯🇲',\n  '💰 Jamaicans, listen up.',\n  '😳 This price is CRIMINAL.',\n  '⚡ Quick deal drop:',\n  '🛒 Don\\'t scroll past this.'\n];\n\nconst tiktokHooks = [\n  `This is WHY everyone is sleeping on this 😳`,\n  `POV: You found a cheat code for shopping 🔥`,\n  `Stop overpaying for this RIGHT NOW`,\n  `Jamaicans NEED to know about this deal`,\n  `I can't believe this price 😭`\n];\n\nconst hashtags = [\n  '#DealPlugJamaica #Jamaica #OnlineDeals #SaveMoney',\n  '#DealPlug #Jamaica #CheapFinds #Deals',\n  '#JamaicaShopping #DealAlert #SaveBig #Jamaica',\n  '#DealPlugJA #BudgetShopping #Jamaica #Deals'\n];\n\nreturn Array.from(map.values())\n  .filter(d => d.price > 0 && d.price <= 15)\n  .sort((a, b) => b.score - a.score)\n  .slice(0, 25)\n  .map(d => {\n    const hook    = twitterHooks[Math.floor(Math.random() * twitterHooks.length)];\n    const tikHook = tiktokHooks[Math.floor(Math.random() * tiktokHooks.length)];\n    const tags    = hashtags[Math.floor(Math.random() * hashtags.length)];\n    const shortTitle = String(d.title).slice(0, 60);\n\n    const tiktokCaption   = `${tikHook}\\n\\n📦 ${shortTitle}...\\n💰 Only $${d.price} USD\\n⭐ ${d.rating} | ${d.orders}+ sold\\n\\nLink in bio 👆 #DealPlugJamaica`;\n    const whatsappMessage = `🔥 *DEAL ALERT* 🔥\\n\\n${String(d.title).slice(0, 80)}\\n\\n💰 Price: $${d.price} USD\\n⭐ Rating: ${d.rating}\\n📦 ${d.orders}+ people already bought this\\n\\n👇 Get it here:\\n${d.affiliateUrl}\\n\\n_DealPlug Jamaica 🇯🇲_`;\n    const telegramMessage = `🔥 <b>DEAL ALERT</b>\\n\\n${String(d.title).slice(0, 100)}\\n💰 <b>$${d.price}</b> USD\\n⭐ ${d.rating} | ${d.orders}+ sold\\n📦 ${d.category}\\n\\n👉 <a href=\"${d.affiliateUrl}\">Buy here</a>`;\n    const tweet           = `${hook}\\n\\n${shortTitle}...\\n💰 $${d.price} · ⭐ ${d.rating} · ${d.orders}+ sold\\n\\n${tags}\\n\\n${d.affiliateUrl}`.slice(0, 280);\n\n    return {\n      json: {\n        ...d,\n        tiktokCaption,\n        whatsappMessage,\n        telegramMessage,\n        tweet,\n        hook: tikHook,\n        postedTelegram: 'No',\n        postedWhatsApp: 'No',\n        postedTwitter:  'No'\n      }\n    };\n  });"
+      },
+      "id": "444ea46d-fc48-4610-b7aa-adfab940ef65",
+      "name": "Deduplicate Rank and Build Copy",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -224,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1u8LUepeWdAP5hMUtGCk4yQ3j_HxxGmwSvJEg4982XDk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Deals"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Title": "={{ $json.title }}",
+            "Price (USD)": "={{ $json.price }}",
+            "Rating": "={{ $json.rating }}",
+            "Orders": "={{ $json.orders }}",
+            "Category": "={{ $json.category }}",
+            "Image URL": "={{ $json.imageUrl }}",
+            "Affiliate Link": "={{ $json.affiliateUrl }}",
+            "TikTok Caption": "={{ $json.tiktokCaption }}",
+            "WhatsApp Message": "={{ $json.whatsappMessage }}",
+            "Tweet": "={{ $json.tweet }}",
+            "Hook": "={{ $json.hook }}",
+            "Commission %": "={{ $json.commissionRate }}",
+            "Scraped At": "={{ $json.scrapedAt }}",
+            "Posted": "No",
+            "Priority": "={{ $json.priceBucket === 'UNDER_5' ? 'HIGH' : 'NORMAL' }}",
+            "Notes": "={{ $json.source }}",
+            "Video Made": "false"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Price (USD)",
+              "displayName": "Price (USD)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Rating",
+              "displayName": "Rating",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Orders",
+              "displayName": "Orders",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Image URL",
+              "displayName": "Image URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Affiliate Link",
+              "displayName": "Affiliate Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "TikTok Caption",
+              "displayName": "TikTok Caption",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "WhatsApp Message",
+              "displayName": "WhatsApp Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tweet",
+              "displayName": "Tweet",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hook",
+              "displayName": "Hook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Commission %",
+              "displayName": "Commission %",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Scraped At",
+              "displayName": "Scraped At",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Posted",
+              "displayName": "Posted",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Video Made",
+              "displayName": "Video Made",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "8a9099c0-a051-4eee-ac4d-2b7d4046468e",
+      "name": "Append Ranked Deals to Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.4,
+      "position": [
+        16,
+        32
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HVNzZnwvqx321S1M",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.config.enableTelegram }}",
+              "value2": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c1731bd2-679d-4efa-9104-805f55c8466c",
+      "name": "Telegram Enabled?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        256,
+        -48
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "-3432705907",
+        "text": "={{ $json.telegramMessage }}",
+        "additionalFields": {
+          "disable_web_page_preview": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "066da14b-12af-4d25-9733-615bb526dfa9",
+      "name": "Send to Telegram Channel",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        496,
+        -112
+      ],
+      "webhookId": "97de61ab-8bcd-4015-9fb7-2a8caa682229",
+      "credentials": {
+        "telegramApi": {
+          "id": "sz8O3J2MH7nUtVsW",
+          "name": "Deal Plug Jamaica"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.config.enableTwitter }}",
+              "value2": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5ffa63ed-6490-4e62-ba77-57a53c5fb514",
+      "name": "Twitter Enabled?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        256,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const all = $input.all().map(i => i.json).sort((a,b) => b.score - a.score).slice(0, Number($input.first().json.config.xDailyLimitPerRun || 5));\nreturn all.map(x => ({ json: x }));"
+      },
+      "id": "43397019-f75a-4efc-970a-f32d8087c59d",
+      "name": "Pick Top Tweets",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        496,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 45
+      },
+      "id": "e449268c-c29e-4c73-9517-9f4ffd503a36",
+      "name": "Wait 45 Seconds",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        736,
+        128
+      ],
+      "webhookId": "3ed8f553-8433-4702-8b78-4a71e2f1efe9"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.tweet }}",
+        "additionalFields": {}
+      },
+      "id": "4aacae9a-c2af-4612-a598-badfee91c2da",
+      "name": "Post to X",
+      "type": "n8n-nodes-base.twitter",
+      "typeVersion": 2,
+      "position": [
+        976,
+        128
+      ],
+      "credentials": {
+        "twitterOAuth2Api": {
+          "id": "vHNqgTEqYiHVx642",
+          "name": "X account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {},
+      "id": "92ebb65f-d42a-44e0-86ee-59592ae14345",
+      "name": "Send to WhatsApp Broadcast",
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        496,
+        336
+      ],
+      "webhookId": "054fc0fe-4568-4440-a91a-a21a79e6cb21",
+      "disabled": true
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Every 3 Hours": {
+      "main": [
+        [
+          {
+            "node": "Set Runtime Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Runtime Config": {
+      "main": [
+        [
+          {
+            "node": "Define Categories",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Define Categories": {
+      "main": [
+        [
+          {
+            "node": "Temu RSS Fetch",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Build AliExpress Signed Params",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Temu RSS Fetch": {
+      "main": [
+        [
+          {
+            "node": "Normalize Temu Deals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Temu Deals": {
+      "main": [
+        [
+          {
+            "node": "Merge Temu + AliExpress",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build AliExpress Signed Params": {
+      "main": [
+        [
+          {
+            "node": "AliExpress Official Fetch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AliExpress Official Fetch": {
+      "main": [
+        [
+          {
+            "node": "Normalize AliExpress Deals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize AliExpress Deals": {
+      "main": [
+        [
+          {
+            "node": "Merge Temu + AliExpress",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Temu + AliExpress": {
+      "main": [
+        [
+          {
+            "node": "Deduplicate Rank and Build Copy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deduplicate Rank and Build Copy": {
+      "main": [
+        [
+          {
+            "node": "Append Ranked Deals to Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append Ranked Deals to Sheets": {
+      "main": [
+        [
+          {
+            "node": "Telegram Enabled?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Twitter Enabled?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Enabled?": {
+      "main": [
+        [
+          {
+            "node": "Send to Telegram Channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Twitter Enabled?": {
+      "main": [
+        [
+          {
+            "node": "Pick Top Tweets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pick Top Tweets": {
+      "main": [
+        [
+          {
+            "node": "Wait 45 Seconds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 45 Seconds": {
+      "main": [
+        [
+          {
+            "node": "Post to X",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "fccc6223-f50c-4ce5-ae85-6ca85dbd47fd",
+  "meta": {
+    "instanceId": "65490e88e4132ab2eb56b57942fcc3ae63dbecc67608a2b7a1f5535650c95a2f"
+  },
+  "id": "ITfFuxkjcglQtsF9",
+  "tags": []
+}
