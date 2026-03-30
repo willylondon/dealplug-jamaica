@@ -13,6 +13,9 @@ export const metadata = {
   authors: [{ name: 'DealPlug Jamaica' }],
   creator: 'DealPlug Jamaica',
   publisher: 'DealPlug Jamaica',
+  verification: {
+    google: 'lVsCNwx076dIsmW7b9kyC2zT4EyNo3BAN1Qxfb4Y4xw',
+  },
   openGraph: {
     type: 'website',
     locale: 'en_JM',
